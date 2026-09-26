@@ -244,7 +244,7 @@ const addonInterface = builder.getInterface();
 // ---------- API & Web endpoints ----------
 
 app.get('/api/status', async (req, res) => {
-  const query = req.query.q || 'Inception 2010';
+  const query = req.query.q || 'Deadpool 2016';
   try {
     const statuses = await Promise.race([
       testAllScrapers(query),
@@ -262,7 +262,7 @@ app.get('/api/test/:scraperName', async (req, res) => {
   const name = req.params.scraperName.toLowerCase();
   const scraper = SCRAPERS.find(s => s.name.toLowerCase() === name);
   if (!scraper) return res.status(404).json({ error: `Scraper '${name}' not found` });
-  const result = await testScraper(scraper, req.query.q || 'The Matrix 1999');
+  const result = await testScraper(scraper, req.query.q || 'Deadpool 2016');
   res.json(result);
 });
 
@@ -402,12 +402,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div id="search-info" style="font-size:12px;color:#666;margin-bottom:8px"></div>
 <div id="search-results"></div></div>
 
-<div class="footer">CHXBIO &mdash; <a href="https://github.com/chouxibdev-stack/chxbio_v2" target="_blank">GitHub</a> &bull; Scrapes BitSearch, LimeTorrents, CPASBien, Torrent9, Nyaa.si, EZTV, YTS, PirateBay</div></div>
+<div class="footer">CHXBIO &mdash; <a href="https://github.com/chouxibdev-stack/chxbio_v2" target="_blank">GitHub</a> &bull; Scrapes LimeTorrents, CPASBien, Torrent9, Nyaa.si, EZTV, YTS, PirateBay</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 async function testAll(){const btn=document.getElementById('test-all-btn');const msg=document.getElementById('test-all-msg');btn.disabled=true;msg.textContent='Testing...';document.querySelectorAll('.scr-item').forEach(el=>{const dot=el.querySelector('.status-dot');dot.className='status-dot yellow';el.querySelector('.scr-status').childNodes[1].textContent=' testing...'});
-try{const r=await fetch('/api/status?q=The+Matrix+1999');const d=await r.json();let w=0,t=0;d.scrapers.forEach(s=>{const el=document.querySelector('.scr-item[data-name="'+s.name.toLowerCase()+'"]');if(!el)return;const dot=el.querySelector('.status-dot');const txt=el.querySelector('.scr-status');if(s.working){dot.className='status-dot green';txt.childNodes[1].textContent=' OK ('+s.resultsCount+' results, '+s.elapsed+'ms)';w++}else{dot.className='status-dot red';txt.childNodes[1].textContent=' FAILED'+(s.error?': '+s.error.substring(0,40):'')};t+=s.elapsed||0});
+try{const r=await fetch('/api/status?q=Deadpool+2016');const d=await r.json();let w=0,t=0;d.scrapers.forEach(s=>{const el=document.querySelector('.scr-item[data-name="'+s.name.toLowerCase()+'"]');if(!el)return;const dot=el.querySelector('.status-dot');const txt=el.querySelector('.scr-status');if(s.working){dot.className='status-dot green';txt.childNodes[1].textContent=' OK ('+s.resultsCount+' results, '+s.elapsed+'ms)';w++}else{dot.className='status-dot red';txt.childNodes[1].textContent=' FAILED'+(s.error?': '+s.error.substring(0,40):'')};t+=s.elapsed||0});
 document.getElementById('stat-working').textContent=w;document.getElementById('stat-failed').textContent=d.total-w;document.getElementById('stat-total').textContent=d.total;document.getElementById('stat-avg-time').textContent=d.total?Math.round(t/d.total)+'ms':'-';msg.textContent='Done ('+d.timestamp.slice(0,19).replace('T',' ')+')'}
 catch(e){msg.textContent='Error: '+e.message;document.querySelectorAll('.scr-item').forEach(el=>{el.querySelector('.status-dot').className='status-dot red';el.querySelector('.scr-status').childNodes[1].textContent=' error'})}
 btn.disabled=false}

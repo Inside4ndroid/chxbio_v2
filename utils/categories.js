@@ -4,10 +4,6 @@ const CATEGORIES = {
 };
 
 const CATEGORY_MAP = {
-  bitsearch: {
-    movie: '1',
-    series: '2'
-  },
   limetorrents: {
     movie: 'movies',
     series: 'tv-shows'

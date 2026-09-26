@@ -76,4 +76,4 @@ function buildSearchQueries(query, type, season, episode) {
   return [...new Set(queries)];
 }
 
-module.exports = { search, name: 'Nyaa.si', baseUrl: BASE_URL };
+module.exports = { search, name: 'Nyaa.si', baseUrl: BASE_URL, testQuery: 'One Piece' };

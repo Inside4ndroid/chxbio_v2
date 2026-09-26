@@ -1,4 +1,3 @@
-const bitsearch = require('./bitsearch');
 const limetorrents = require('./limetorrents');
 const cpasbien = require('./cpasbien');
 const torrent9 = require('./torrent9');
@@ -8,12 +7,10 @@ const nyaa = require('./nyaa');
 const eztv = require('./eztv');
 const yts = require('./yts');
 const piratebay = require('./piratebay');
-const uindex = require('./uindex');
 const extto = require('./extto');
 const rargb = require('./rargb');
 
 const SCRAPERS = [
-  bitsearch,
   limetorrents,
   cpasbien,
   torrent9,
@@ -23,7 +20,6 @@ const SCRAPERS = [
   eztv,
   yts,
   piratebay,
-  uindex,
   extto,
   rargb
 ];
@@ -51,11 +47,18 @@ function getAllScraperMeta() {
 
 async function testScraper(scraper, query) {
   const start = Date.now();
+  const withTimeout = (promise) => Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 25000))
+  ]);
   try {
-    const results = await Promise.race([
-      scraper.search(query, 'movie', null, null),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 25000))
-    ]);
+    let results = await withTimeout(scraper.search(query, 'movie', null, null));
+    // Niche trackers (e.g. anime-only) may legitimately return nothing for the
+    // generic test query — retry with the scraper's own test query if it has one.
+    if ((!Array.isArray(results) || results.length === 0) && scraper.testQuery && scraper.testQuery !== query) {
+      console.log(`[${scraper.name}] no results for "${query}", retrying with "${scraper.testQuery}"`);
+      results = await withTimeout(scraper.search(scraper.testQuery, 'movie', null, null));
+    }
     const elapsed = Date.now() - start;
     return {
       name: scraper.name,
@@ -77,7 +80,7 @@ async function testScraper(scraper, query) {
   }
 }
 
-async function testAllScrapers(query = 'The Matrix 1999') {
+async function testAllScrapers(query = 'Deadpool 2016') {
   const enabled = getEnabledScrapers();
   const results = await Promise.allSettled(enabled.map(s => testScraper(s, query)));
   const statuses = [];
@@ -176,18 +179,10 @@ async function getTopTorrents(type = 'movie', limit = 20) {
 
   let homePromises = [];
 
-  if (scrapers.some(s => s.name === 'BitSearch')) {
-    homePromises.push(
-      bitsearch.search(limit > 10 ? '2024' : '2024', type)
-        .then(r => r.slice(0, Math.ceil(limit / 2)))
-        .catch(() => [])
-    );
-  }
-
   if (scrapers.some(s => s.name === 'LimeTorrents')) {
     homePromises.push(
       limetorrents.search(limit > 10 ? '4K' : '1080p', type)
-        .then(r => r.slice(0, Math.ceil(limit / 2)))
+        .then(r => r.slice(0, limit))
         .catch(() => [])
     );
   }

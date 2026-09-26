@@ -1,11 +1,11 @@
 {
   "name": "chxbio",
   "version": "1.0.0",
-  "description": "Stremio torrent addon - scrapes BitSearch, LimeTorrents, CPASBien, Torrent9, Nyaa.si and more",
+  "description": "Stremio torrent addon - scrapes LimeTorrents, CPASBien, Torrent9, Nyaa.si and more",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node --watch server.js"
   },
   "dependencies": {
     "axios": "^1.6.0",
